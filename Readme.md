@@ -1,7 +1,7 @@
 ﻿# Личный проект «Кекстаграм» [![Build status][travis-image]][travis-url]
 
 * Студент: [Ромик Шаров](https://up.htmlacademy.ru/javascript/11/user/195544).
-* Наставник: `Андрей Рыжаков`.
+* Наставник: [Андрей Рыжаков](https://htmlacademy.ru/profile/id201015).
 
 ---
 
