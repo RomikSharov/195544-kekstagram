@@ -21,23 +21,6 @@ function getRandValue(arr, counter) { // { start: 1, end: 2}
   return tmp;
 }
 
-
-// var createComments = function () {
-//   var commentsLength = comments.length;
-//   var firstSentence = comments[Math.floor(Math.random() * (commentsLength))];
-//   var secondSentence = '';
-//   if (Math.random() > 0.5) {
-//     do {
-//       secondSentence = comments[Math.floor(Math.random() * (commentsLength))];
-//     } while (secondSentence === firstSentence);
-//   } else {
-//     return [firstSentence];
-//   }
-
-//   return [firstSentence, secondSentence];
-// };
-
-
 function createPhotos() {
   var photosArr = [];
   for (var i = 0; i <= 25; i++) {
