@@ -50,38 +50,30 @@ function createPhotos() {
   return photosArr;
 }
 
-var renderNode = function (parent, subNode, data) {
-  parent.querySelector(subNode.name)[subNode.attribute] = data[subNode.data];
+var renderNode = function (parent, subNodes, data) {
+  var length = subNodes.length;
+  for (var i = 0; i < length; i++) {
+    parent.querySelector(subNodes[i].name)[subNodes[i].attribute] = data[subNodes[i].data];
+  }
   return parent;
 };
 
 function renderPictures(photosArr) {
-  var photosLength = photosArr.length;
-  for (var i = 0; i < photosLength; i++) {
+  var length = photosArr.length;
+  for (var i = 0; i < length; i++) {
     var pictureNode = pictureNodeTemplate.content.cloneNode(true);
-    var length = subPictureNodes.length;
-    for (var j = 0; j < length; j++) {
-      pictureNode = renderNode(pictureNode, subPictureNodes[j], photosArr[i]);
-    }
+    pictureNode = renderNode(pictureNode, subPictureNodes, photosArr[i]);
     fragment.appendChild(pictureNode);
   }
   return fragment;
 }
 
-function renderOverlayNode(overlayNode) {
-  var length = subOverlayNodes.length;
-  for (var i = 0; i < length; i++) {
-    overlayNode = renderNode(overlayNode, subOverlayNodes[i], photos[0]);
-  }
-  return overlayNode;
-}
-
 var photos = createPhotos();
 
 var fragment = document.createDocumentFragment();
-var pictureNodeTemplate = document.querySelector('#picture-template');
 var pictures = document.querySelector('.pictures');
+var pictureNodeTemplate = document.querySelector('#picture-template');
 pictures.appendChild(renderPictures(photos));
 
-var overlayNode = renderOverlayNode(document.querySelector('.gallery-overlay'));
+var overlayNode = renderNode(document.querySelector('.gallery-overlay'), subOverlayNodes, photos[0]);
 overlayNode.classList.remove('hidden');
