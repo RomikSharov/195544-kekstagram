@@ -10,147 +10,92 @@ var comments = [
   'Я поскользнулся на банановой кожуре и уронил фотоаппарат на кота и у меня получилась фотография лучше.',
   'Лица у людей на фотке перекошены, как будто их избивают. Как можно было поймать такой неудачный момент?!'];
 
-var subPictureNodes = [
-  {name: '.picture img', attribute: 'src', data: 'url'},
-  {name: '.picture-likes', attribute: 'textContent', data: 'likes'},
-  {name: '.picture-comments', attribute: 'textContent', data: 'numberOfComments'}
-];
+var photoCount = 25;
 
-var subOverlayNodes = [
-  {name: '.gallery-overlay-image', attribute: 'src', data: 'url'},
-  {name: '.likes-count', attribute: 'textContent', data: 'likes'},
-  {name: '.comments-count', attribute: 'textContent', data: 'numberOfComments'}
-];
+var pictureTemplate = document.querySelector('#picture-template');
 
-function getRandomNumber(min, max) {
-  var rand = min + Math.floor(Math.random() * (max - min + 1));
-  return rand;
-}
+var pictureContainer = document.querySelector('.pictures');
 
-function getRandValue(arr, counter) { // { start: 1, end: 2}
-  var index = getRandomNumber(counter.start, counter.end);
-  var tmp = arr[index];
-  arr[index] = arr[0];
-  arr[0] = tmp;
-  return tmp;
-}
+var popup = document.querySelector('.gallery-overlay');
+var popupImg = popup.querySelector('.gallery-overlay-image');
+var popupLikes = popup.querySelector('.likes-count');
+var popupComments = popup.querySelector('.comments-count');
+var popupClose = popup.querySelector('.gallery-overlay-close');
 
-function makePhoto() {
-  var photoObj = {
-    url: 'photos/default',
-    numberOfLikes: 0,
-    comments: [],
-    numberOfComments: 0
-  };
-  function photo() {
-    return {url: photoObj.url, numberOfLikes: photoObj.numberOfLikes, comments: photoObj.comments};
+function getPhotos() {
+  var arr = [];
+  for (var i = 1; i <= photoCount; i++) {
+    var item = {};
+    item.url = 'photos/' + i + '.jpg';
+    item.likes = getRandomNumber(15, 200);
+    item.comments = getRandomArr(comments, 2);
+    arr.push(item);
   }
-  photo.set = function (data) {
-    var length = data.length;
-    for (var i = 0; i < length; i++) {
-      photoObj[data[i].name] = data[i].value;
+  return arr;
+}
+
+function createPicture(data, i) {
+  var template = pictureTemplate.content.cloneNode(true);
+  var img = template.querySelector('img');
+  img.src = data.url;
+  img.dataset.key = i;
+  template.querySelector('.picture-likes').textContent = data.likes;
+  template.querySelector('.picture-comments').textContent = data.comments.length;
+
+  return template;
+}
+function renderPictures(data) {
+  var fragment = document.createDocumentFragment();
+  data.forEach(function (item, i) {
+    fragment.appendChild(createPicture(item, i));
+  });
+  pictureContainer.appendChild(fragment);
+}
+function renderPopup(pic) {
+  popupImg.src = pic.url;
+  popupLikes.textContent = pic.likes;
+  popupComments.textContent = pic.comments.length;
+
+  popup.classList.remove('hidden');
+}
+
+//  ************************************************
+function openPopup(evt, data) {
+  if ((('keyCode' in evt) && (evt.keyCode === ENTER_KEYCODE)) || !('keyCode' in evt)) {
+    evt.preventDefault();
+    var target = evt.target.closest('.picture');
+    if (target) {
+      var img = target.querySelector('img');
+      var index = parseInt(img.dataset.key, 10);
+      renderPopup(data[index]);
+
+      document.addEventListener('keydown', onEscPress);
+      popupClose.addEventListener('click', closePopup);
+      popupClose.addEventListener('keydown', onPopupCloseEnterPress);
     }
-  };
-  photo.get = function (attribute) {
-    return photoObj[attribute];
-  };
-  return photo;
-}
-
-function createPhotos() {
-  var photosArr = [];
-  for (var i = 0; i <= 25; i++) {
-    var url = 'photos/' + (i + 1) + '.jpg';
-    var likes = getRandomNumber(15, 200);
-    var currentComments = Array(getRandomNumber(1, 2));
-    var commentsLength = comments.length;
-    var length = currentComments.length;
-    for (var j = 0; j < length; j++) {
-      currentComments[j] = getRandValue(comments, {start: j, end: commentsLength - 1});
-    }
-    var photo = makePhoto();
-    photo.set([
-      {name: 'url', value: url},
-      {name: 'likes', value: likes},
-      {name: 'currentComments', value: currentComments},
-      {name: 'numberOfComments', value: length}]);
-    photosArr[i] = photo;
   }
-  return photosArr;
-}
-
-var renderNode = function (parent, subNodes, value) {
-  var length = subNodes.length;
-  for (var i = 0; i < length; i++) {
-    parent.querySelector(subNodes[i].name)[subNodes[i].attribute] = value.get(subNodes[i].data);
-  }
-  return parent;
-};
-
-function renderPictures(photosArr) {
-  var length = photosArr.length;
-  for (var i = 0; i < length; i++) {
-    var pictureNode = pictureNodeTemplate.content.cloneNode(true);
-    pictureNode = renderNode(pictureNode, subPictureNodes, photosArr[i]);
-    fragment.appendChild(pictureNode);
-  }
-  return fragment;
-}
-//  ******************* функции для событий
-function openPopup(evt) {
-  var imgSrc = evt.currentTarget.querySelector('.picture img').src;
-  var index = imgSrc.substring(imgSrc.lastIndexOf('/') + 1, imgSrc.lastIndexOf('.'));
-  overlayNode = renderNode(overlayNode, subOverlayNodes, photos[index - 1]);
-  overlayNode.classList.remove('hidden');
-  evt.preventDefault();
-
-  overlayHidden.addEventListener('click', onOverlayCloseClick);
-  overlayHidden.addEventListener('keydown', onCloseEnterPress);
-  document.addEventListener('keydown', onPopupEscPress);
 }
 function closePopup() {
-  overlayNode.classList.add('hidden');
-  overlayHidden.removeEventListener('click', onOverlayCloseClick);
-  overlayHidden.removeEventListener('keydown', onCloseEnterPress);
-  document.removeEventListener('click', onPopupEscPress);
-}
+  popup.classList.add('hidden');
 
-var onPopupEscPress = function (evt) {
+  popupClose.removeEventListener('click', closePopup);
+  popupClose.removeEventListener('keydown', onPopupCloseEnterPress);
+  document.removeEventListener('keydown', onEscPress);
+}
+function onEscPress(evt) {
   if (evt.keyCode === ESC_KEYCODE) {
     closePopup();
   }
-};
-var onCloseEnterPress = function (evt) {
+}
+function onPopupCloseEnterPress(evt) {
   if (evt.keyCode === ENTER_KEYCODE) {
     closePopup();
   }
-};
-function onOverlayCloseClick(evt) {
-  closePopup();
 }
-function onPictureClick(evt) {
-  openPopup(evt);
-}
-var onPictureEnterPress = function (evt) {
-  if (evt.keyCode === ENTER_KEYCODE) {
-    openPopup(evt);
-  }
-};
-//  **************************
-var photos = createPhotos();
+//  ************************************************
+var photoArr = getPhotos();
 
-var fragment = document.createDocumentFragment();
-var pictures = document.querySelector('.pictures');
-var pictureNodeTemplate = document.querySelector('#picture-template');
-pictures.appendChild(renderPictures(photos));
+renderPictures(photoArr);
 
-var overlayNode = document.querySelector('.gallery-overlay');
-var overlayHidden = overlayNode.querySelector('.gallery-overlay-close');
-var pictureElements = document.querySelectorAll('.picture');
-for (var i = 0; i < pictureElements.length; i++) {
-  pictureElements[i].addEventListener('click', onPictureClick);
-  pictureElements[i].addEventListener('keydown', onPictureEnterPress);
-}
-
-//  var overlayNode = renderNode(document.querySelector('.gallery-overlay'), subOverlayNodes, photos[0]);
-//  overlayNode.classList.remove('hidden');
+pictureContainer.addEventListener('click', clickHandler(openPopup, photoArr));
+pictureContainer.addEventListener('keydown', clickHandler(openPopup, photoArr));
