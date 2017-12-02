@@ -42,8 +42,5 @@ function keyDownHendler() {
       callback.apply(null, args);
       args.shift();
     }
-    // else {
-    //   return false;
-    // }
   };
 }
