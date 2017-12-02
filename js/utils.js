@@ -3,6 +3,8 @@
   window.utils = {
     ESC_KEYCODE: 27,
     ENTER_KEYCODE: 13,
+    BLACK: 'black',
+    RED: 'red',
 
     getRandomNumber: function (min, max) {
       var randomNum = min + Math.floor(Math.random() * (max - min + 1));
