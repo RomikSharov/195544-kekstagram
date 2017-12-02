@@ -1,17 +1,17 @@
 'use strict';
-var ESC_KEYCODE = 27;
-var ENTER_KEYCODE = 13;
+// var ESC_KEYCODE = 27;
+// var ENTER_KEYCODE = 13;
 
-var comments = [
-  'Всё отлично!',
-  'В целом всё неплохо. Но не всё.',
-  'Когда вы делаете фотографию, хорошо бы убирать палец из кадра. В конце концов это просто непрофессионально.',
-  'Моя бабушка случайно чихнула с фотоаппаратом в руках и у неё получилась фотография лучше.',
-  'Я поскользнулся на банановой кожуре и уронил фотоаппарат на кота и у меня получилась фотография лучше.',
-  'Лица у людей на фотке перекошены, как будто их избивают. Как можно было поймать такой неудачный момент?!'
-];
+// var comments = [
+//   'Всё отлично!',
+//   'В целом всё неплохо. Но не всё.',
+//   'Когда вы делаете фотографию, хорошо бы убирать палец из кадра. В конце концов это просто непрофессионально.',
+//   'Моя бабушка случайно чихнула с фотоаппаратом в руках и у неё получилась фотография лучше.',
+//   'Я поскользнулся на банановой кожуре и уронил фотоаппарат на кота и у меня получилась фотография лучше.',
+//   'Лица у людей на фотке перекошены, как будто их избивают. Как можно было поймать такой неудачный момент?!'
+// ];
 
-var photoCount = 25;
+// var photoCount = 25;
 
 var pictureTemplate = document.querySelector('#picture-template');
 
@@ -38,17 +38,17 @@ var radioContainer = document.querySelector('.upload-effect-controls');
 
 var hashtagsElem = uploadPopup.querySelector('.upload-form-hashtags');
 //  *******************************************
-function getPhotos() {
-  var arr = [];
-  for (var i = 1; i <= photoCount; i++) {
-    var item = {};
-    item.url = 'photos/' + i + '.jpg';
-    item.likes = getRandomNumber(15, 200);
-    item.comments = getRandomArr(comments, 2);
-    arr.push(item);
-  }
-  return arr;
-}
+// function getPhotos() {
+//   var arr = [];
+//   for (var i = 1; i <= photoCount; i++) {
+//     var item = {};
+//     item.url = 'photos/' + i + '.jpg';
+//     item.likes = window.utils.getRandomNumber(15, 200);
+//     item.comments = window.utils.getRandomArr(comments, 2);
+//     arr.push(item);
+//   }
+//   return arr;
+// }
 
 function createPicture(data, i) {
   var template = pictureTemplate.content.cloneNode(true);
@@ -87,7 +87,7 @@ function openPopup(evt, data) {
   }
 }
 function closePopup(evt) {
-  if (evt.target.closest('.gallery-overlay-close') || event.keyCode === ESC_KEYCODE) {
+  if (evt.target.closest('.gallery-overlay-close') || event.keyCode === window.utils.ESC_KEYCODE) {
     if (!popup.classList.contains('hidden')) {
       popup.classList.add('hidden');
     }
@@ -100,7 +100,7 @@ function openUploadFile(evt) {
   uploadPopup.classList.remove('hidden');
 }
 function closeUploadFile(evt) {
-  if (evt.target.closest('.upload-form-cancel') || (event.keyCode === ESC_KEYCODE && evt.target !== uploadComment)) {
+  if (evt.target.closest('.upload-form-cancel') || (evt.keyCode === window.utils.ESC_KEYCODE && evt.target !== uploadComment)) {
     if (!uploadPopup.classList.contains('hidden')) {
       uploadPopup.classList.add('hidden');
     }
@@ -163,22 +163,22 @@ function checkForm(evt) {
 }
 //  *************************************************
 
-var photoArr = getPhotos();
+var photoArr = window.data.getPhotos();
 
 renderPictures(photoArr);
 
-pictureContainer.addEventListener('click', clickHandler(openPopup, photoArr));
-popup.addEventListener('click', clickHandler(closePopup));
+pictureContainer.addEventListener('click', window.utils.clickHandler(openPopup, photoArr));
+popup.addEventListener('click', window.utils.clickHandler(closePopup));
 
-document.addEventListener('keydown', keyDownHendler(closePopup, ESC_KEYCODE));
-document.addEventListener('keydown', keyDownHendler(openPopup, ENTER_KEYCODE, photoArr));
-document.addEventListener('keydown', keyDownHendler(closePopup, ENTER_KEYCODE));
+document.addEventListener('keydown', window.utils.keyDownHendler(closePopup, window.utils.ESC_KEYCODE));
+document.addEventListener('keydown', window.utils.keyDownHendler(openPopup, window.utils.ENTER_KEYCODE, photoArr));
+document.addEventListener('keydown', window.utils.keyDownHendler(closePopup, window.utils.ENTER_KEYCODE));
 
 //  ******************* module4-task2*****************
 uploadFile.addEventListener('change', openUploadFile);
 uploadPopup.addEventListener('click', closeUploadFile);
-document.addEventListener('keydown', keyDownHendler(closeUploadFile, ESC_KEYCODE));
-document.addEventListener('keydown', keyDownHendler(closeUploadFile, ENTER_KEYCODE));
+document.addEventListener('keydown', window.utils.keyDownHendler(closeUploadFile, window.utils.ESC_KEYCODE));
+document.addEventListener('keydown', window.utils.keyDownHendler(closeUploadFile, window.utils.ENTER_KEYCODE));
 
 document.querySelector('#upload-select-image').setAttribute('action', 'https://js.dump.academy/kekstagram');
 document.querySelector('.upload-form-description').setAttribute('maxlength', '140');
