@@ -8,7 +8,8 @@ var comments = [
   'Когда вы делаете фотографию, хорошо бы убирать палец из кадра. В конце концов это просто непрофессионально.',
   'Моя бабушка случайно чихнула с фотоаппаратом в руках и у неё получилась фотография лучше.',
   'Я поскользнулся на банановой кожуре и уронил фотоаппарат на кота и у меня получилась фотография лучше.',
-  'Лица у людей на фотке перекошены, как будто их избивают. Как можно было поймать такой неудачный момент?!'];
+  'Лица у людей на фотке перекошены, как будто их избивают. Как можно было поймать такой неудачный момент?!'
+];
 
 var photoCount = 25;
 
@@ -36,9 +37,8 @@ function getPhotos() {
 
 function createPicture(data, i) {
   var template = pictureTemplate.content.cloneNode(true);
-  var img = template.querySelector('img');
-  img.src = data.url;
-  img.dataset.key = i;
+  template.querySelector('.picture').dataset.key = i;
+  template.querySelector('img').src = data.url;
   template.querySelector('.picture-likes').textContent = data.likes;
   template.querySelector('.picture-comments').textContent = data.comments.length;
 
@@ -57,45 +57,37 @@ function renderPopup(pic) {
   popupComments.textContent = pic.comments.length;
 
   popup.classList.remove('hidden');
+  popupClose.setAttribute('tabindex', 0);
 }
 
 //  ************************************************
 function openPopup(evt, data) {
-  if ((('keyCode' in evt) && (evt.keyCode === ENTER_KEYCODE)) || !('keyCode' in evt)) {
-    evt.preventDefault();
-    var target = evt.target.closest('.picture');
-    if (target) {
-      var img = target.querySelector('img');
-      var index = parseInt(img.dataset.key, 10);
-      renderPopup(data[index]);
+  evt.preventDefault();
+  var target = evt.target.closest('.picture');
+  if (target) {
+    var index = parseInt(target.dataset.key, 10);
+    renderPopup(data[index]);
+  }
+}
+function closePopup(evt) {
+  if (evt.target.closest('.gallery-overlay-close') || event.keyCode === ESC_KEYCODE) {
+    popup.classList.add('hidden');
 
-      document.addEventListener('keydown', onEscPress);
-      popupClose.addEventListener('click', closePopup);
-      popupClose.addEventListener('keydown', onPopupCloseEnterPress);
-    }
+    popupClose.removeAttribute('tabindex');
   }
 }
-function closePopup() {
-  popup.classList.add('hidden');
 
-  popupClose.removeEventListener('click', closePopup);
-  popupClose.removeEventListener('keydown', onPopupCloseEnterPress);
-  document.removeEventListener('keydown', onEscPress);
-}
-function onEscPress(evt) {
-  if (evt.keyCode === ESC_KEYCODE) {
-    closePopup();
-  }
-}
-function onPopupCloseEnterPress(evt) {
-  if (evt.keyCode === ENTER_KEYCODE) {
-    closePopup();
-  }
-}
 //  ************************************************
+
 var photoArr = getPhotos();
 
 renderPictures(photoArr);
 
 pictureContainer.addEventListener('click', clickHandler(openPopup, photoArr));
-pictureContainer.addEventListener('keydown', clickHandler(openPopup, photoArr));
+popup.addEventListener('click', clickHandler(closePopup));
+
+document.addEventListener('keydown', keyDownHendler(closePopup, ESC_KEYCODE));
+document.addEventListener('keydown', keyDownHendler(openPopup, ENTER_KEYCODE, photoArr));
+document.addEventListener('keydown', keyDownHendler(closePopup, ENTER_KEYCODE));
+
+

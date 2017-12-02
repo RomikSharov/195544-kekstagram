@@ -31,3 +31,18 @@ function clickHandler() {
     callback.apply(null, args);
   };
 }
+
+function keyDownHendler() {
+  var args = Array.from(arguments);
+  var callback = args.splice(0, 1)[0];
+  var keyCode = args.splice(0, 1)[0];
+  return function(event) {
+    if (event.keyCode === keyCode) {
+      args.unshift(event);
+      callback.apply(null, args);
+      args.shift();
+    } else {
+      return false;
+    }
+  };
+}
