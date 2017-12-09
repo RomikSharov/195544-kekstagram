@@ -33,29 +33,36 @@
     parentWidth: 0
   };
   slider.addEventListener('dragstart', onDragstartSlider);
-  slider.addEventListener('drag', onDragSlider);
-  slider.addEventListener('dragend', onDropSlider);
 
   function onDragstartSlider(evt) {
+    evt.preventDefault();
     evt.dataTransfer.setData('text/plain', evt.target.alt);
     sliderData.parentWidth = slider.parentElement.clientWidth;
     sliderData.minX = evt.clientX - sliderData.parentWidth / 100 * popup.effect;
-  }
-  function onDragSlider(evt) {
-    evt.preventDefault();
-    var temp = (evt.clientX - sliderData.minX) / (sliderData.parentWidth / 100);
-    if (temp > 100) {
-      temp = 100;
-    } else if (temp < 0) {
-      temp = 0;
+
+    function onMouseMove(moveEvt) {
+      moveEvt.preventDefault();
+      var temp = (moveEvt.clientX - sliderData.minX) / (sliderData.parentWidth / 100);
+      if (temp > 100) {
+        temp = 100;
+      } else if (temp < 0) {
+        temp = 0;
+      }
+
+      popup.effect = temp;
+      renderPopup();
     }
 
-    popup.effect = temp;
-    renderPopup();
-  }
+    function onMouseUp(upEvt) {
+      upEvt.preventDefault();
 
-  function onDropSlider(evt) {
-    evt.preventDefault();
+      document.removeEventListener('mousemove', onMouseMove);
+      document.removeEventListener('mouseup', onMouseUp);
+    }
+
+    document.addEventListener('mousemove', onMouseMove);
+    document.addEventListener('mouseup', onMouseUp);
+
   }
   //  ****************************************** module5-task2 End
 
