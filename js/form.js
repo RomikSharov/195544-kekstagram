@@ -6,8 +6,7 @@
   var uploadSubmit = document.querySelector('#upload-submit');
 
   var uploadResize = document.querySelector('.upload-resize-controls-value');
-  var buttonDec = document.querySelector('.upload-resize-controls-button-dec');
-  var buttonInc = document.querySelector('.upload-resize-controls-button-inc');
+
   var imagePreview = document.querySelector('.effect-image-preview');
 
   var radioContainer = document.querySelector('.upload-effect-controls');
@@ -19,7 +18,11 @@
     'filter': 'effect-none',
     'effect': 100
   };
-
+  var scale = {
+    min: 25,
+    max: 100,
+    step: 25
+  };
 
   //  ***************************** module5-task2 Start
   var sliderForm = uploadPopup.querySelector('.upload-effect-level');
@@ -27,42 +30,9 @@
   var bar = sliderForm.querySelector('.upload-effect-level-val');
   var sliderUploadValue = sliderForm.querySelector('.upload-effect-level-value');
 
-  slider.setAttribute('draggable', true);
-  var sliderData = {
-    minX: 0,
-    parentWidth: 0
-  };
-  slider.addEventListener('dragstart', onDragstartSlider);
-
-  function onDragstartSlider(evt) {
-    evt.preventDefault();
-    evt.dataTransfer.setData('text/plain', evt.target.alt);
-    sliderData.parentWidth = slider.parentElement.clientWidth;
-    sliderData.minX = evt.clientX - sliderData.parentWidth / 100 * popup.effect;
-
-    function onMouseMove(moveEvt) {
-      moveEvt.preventDefault();
-      var temp = (moveEvt.clientX - sliderData.minX) / (sliderData.parentWidth / 100);
-      if (temp > 100) {
-        temp = 100;
-      } else if (temp < 0) {
-        temp = 0;
-      }
-
-      popup.effect = temp;
-      renderPopup();
-    }
-
-    function onMouseUp(upEvt) {
-      upEvt.preventDefault();
-
-      document.removeEventListener('mousemove', onMouseMove);
-      document.removeEventListener('mouseup', onMouseUp);
-    }
-
-    document.addEventListener('mousemove', onMouseMove);
-    document.addEventListener('mouseup', onMouseUp);
-
+  function apllySlider(actualEffect) {
+    popup.effect = actualEffect;
+    renderPopup();
   }
   //  ****************************************** module5-task2 End
 
@@ -71,7 +41,7 @@
     imagePreview.style.transform = 'scale(' + popup.scale / 100 + ')';
 
     slider.style.left = popup.effect + '%';
-    bar.style['width'] = popup.effect + '%';
+    bar.style.width = popup.effect + '%';
     sliderUploadValue.setAttribute('value', Math.round(popup.effect));
 
     if (imagePreview.classList.length === 2) {
@@ -83,25 +53,26 @@
       sliderForm.classList.add('hidden');
     } else {
       sliderForm.classList.remove('hidden');
-      switch (popup.filter) {
-        case 'effect-chrome':
-          imagePreview.style['filter'] = 'grayscale(' + 0.01 * popup.effect + ')';
-          break;
-        case 'effect-sepia':
-          imagePreview.style['filter'] = 'sepia(' + 0.01 * popup.effect + ')';
-          break;
-        case 'effect-marvin':
-          imagePreview.style['filter'] = 'invert(' + popup.effect + '%)';
-          break;
-        case 'effect-phobos':
-          imagePreview.style['filter'] = 'blur(' + 0.05 * popup.effect + 'px)';
-          break;
-        case 'effect-heat':
-          imagePreview.style['filter'] = 'brightness(' + 0.03 * popup.effect + ')';
-          break;
-        default:
-          imagePreview.style['filter'] = '';
-      }
+    }
+
+    switch (popup.filter) {
+      case 'effect-chrome':
+        imagePreview.style.filter = 'grayscale(' + 0.01 * popup.effect + ')';
+        break;
+      case 'effect-sepia':
+        imagePreview.style.filter = 'sepia(' + 0.01 * popup.effect + ')';
+        break;
+      case 'effect-marvin':
+        imagePreview.style.filter = 'invert(' + popup.effect + '%)';
+        break;
+      case 'effect-phobos':
+        imagePreview.style.filter = 'blur(' + 0.05 * popup.effect + 'px)';
+        break;
+      case 'effect-heat':
+        imagePreview.style.filter = 'brightness(' + 0.03 * popup.effect + ')';
+        break;
+      default:
+        imagePreview.style.filter = '';
     }
   }
 
@@ -130,22 +101,14 @@
     }
   }
 
-  function onClickButtonDecInc(evt) {
-    if (evt.target === buttonDec) {
-      popup.scale = Math.max(25, popup.scale - 25);
-    } else {
-      popup.scale = Math.min(100, popup.scale + 25);
-    }
+  function apllyFilter(actualFilter) {
+    popup.filter = actualFilter.substring('upload-'.length);
+    popup.effect = 100;
     renderPopup();
   }
-
-  function onClickFilter(evt) {
-    var elt = evt.target.closest('input[type="radio"]');
-    if (elt) {
-      popup.filter = elt.id.substring('upload-'.length);
-      popup.effect = 100;
-      renderPopup();
-    }
+  function apllyScale(actualScale) {
+    popup.scale = actualScale;
+    renderPopup();
   }
 
   function checkHashtags() {
@@ -195,10 +158,12 @@
       document.querySelector('#upload-select-image').setAttribute('action', 'https://js.dump.academy/kekstagram');
       document.querySelector('.upload-form-description').setAttribute('maxlength', '140');
 
-      buttonDec.addEventListener('click', onClickButtonDecInc);
-      buttonInc.addEventListener('click', onClickButtonDecInc);
+      window.initializeScale(scale, popup, apllyScale);
 
-      radioContainer.addEventListener('click', onClickFilter);
+      window.initializeFilters(radioContainer, apllyFilter);
+
+      window.initializeSlider(slider, apllySlider);
+
 
       uploadSubmit.addEventListener('click', checkForm);
     }
