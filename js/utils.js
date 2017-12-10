@@ -45,6 +45,29 @@
           args.shift();
         }
       };
+    },
+    onError: function (errorMessage) {
+
+      var node = document.querySelector('.errorMessage');
+      if (!node) {
+        node = document.createElement('div');
+        node.classList.add('errorMessage');
+      }
+
+      node.style = 'z-index: 100; margin: 0 auto; text-align: center; background-color: red;';
+      node.style.position = 'absolute';
+      node.style.left = 0;
+      node.style.right = 0;
+      node.style.fontSize = '24px';
+
+      node.textContent = errorMessage;
+      document.body.insertAdjacentElement('afterbegin', node);
+    },
+    removeErrorMessage: function () {
+      var node = document.querySelector('.errorMessage');
+      if (node) {
+        node.remove();
+      }
     }
   };
 })();

@@ -1,15 +1,15 @@
 'use strict';
 (function () {
-  var uploadPopup = document.querySelector('.upload-overlay');
-  var uploadFile = document.querySelector('#upload-file');
-  var uploadComment = document.querySelector('.upload-form-description');
-  var uploadSubmit = document.querySelector('#upload-submit');
+  var uploadForm = document.querySelector('#upload-select-image');
+  var uploadPopup = uploadForm.querySelector('.upload-overlay');
+  var uploadFile = uploadForm.querySelector('#upload-file');
+  var uploadComment = uploadForm.querySelector('.upload-form-description');
 
-  var uploadResize = document.querySelector('.upload-resize-controls-value');
+  var uploadResize = uploadForm.querySelector('.upload-resize-controls-value');
 
-  var imagePreview = document.querySelector('.effect-image-preview');
+  var imagePreview = uploadForm.querySelector('.effect-image-preview');
 
-  var radioContainer = document.querySelector('.upload-effect-controls');
+  var radioContainer = uploadForm.querySelector('.upload-effect-controls');
 
   var hashtagsElem = uploadPopup.querySelector('.upload-form-hashtags');
 
@@ -24,7 +24,6 @@
     step: 25
   };
 
-  //  ***************************** module5-task2 Start
   var sliderForm = uploadPopup.querySelector('.upload-effect-level');
   var slider = sliderForm.querySelector('.upload-effect-level-pin');
   var bar = sliderForm.querySelector('.upload-effect-level-val');
@@ -34,7 +33,6 @@
     popup.effect = actualEffect;
     renderPopup();
   }
-  //  ****************************************** module5-task2 End
 
   function renderPopup() {
     uploadResize.setAttribute('value', popup.scale);
@@ -112,6 +110,11 @@
   }
 
   function checkHashtags() {
+    window.utils.removeErrorMessage();
+
+    // убираю пробелы
+    hashtagsElem.value = (hashtagsElem.value || '').trim().replace(/\s{2,}/g, ' ');
+
     if (hashtagsElem.value.length === 0) {
       return false;
     }
@@ -119,21 +122,29 @@
     var length = hashtags.length;
     //  проверяю количество хэш-тегов
     if (length > 5) {
+      window.utils.onError('Хеш-тёгов должно быть не больше 5');
       return true;
     }
 
     for (var i = 0; i < length; i++) {
       //  проверяю первый символ хэш-тега
       if (hashtags[i][0] !== '#') {
+        window.utils.onError('Хеш-тёги должны начинатся с #');
+        return true;
+      }
+      if (hashtags[i].split('#').length > 2) {
+        window.utils.onError('Хеш-тёги должны разделяться пробелами');
         return true;
       }
       //  проверяю длину хэш-тега
-      if (hashtags[0].length > 20) {
+      if (hashtags[0].length > 21) {
+        window.utils.onError('Хеш-тёги должны быть короче 20 символов');
         return true;
       }
       //  проверяю совпадение хэш-тегов
-      for (var j = 0; j < length; j++) {
+      for (var j = i; j < length; j++) {
         if (hashtags[i].toLowerCase() === hashtags[j].toLowerCase() && i !== j) {
+          window.utils.onError('Хеш-тёги не должны повторяться');
           return true;
         }
       }
@@ -141,10 +152,20 @@
     return false;
   }
 
-  function checkForm(evt) {
+  function onSubmitForm(evt) {
+    evt.preventDefault();
+
+    function onLoad() {
+      resetDefault();
+      uploadPopup.classList.add('hidden');
+      uploadForm.reset();
+    }
+
     if (checkHashtags()) {
       hashtagsElem.style.borderColor = window.utils.RED;
       evt.preventDefault();
+    } else {
+      window.backend.save(new FormData(uploadForm), onLoad, window.utils.onError);
     }
   }
 
@@ -155,7 +176,6 @@
       document.addEventListener('keydown', window.utils.keyDownHendler(closeUploadFile, window.utils.ESC_KEYCODE));
       document.addEventListener('keydown', window.utils.keyDownHendler(closeUploadFile, window.utils.ENTER_KEYCODE));
 
-      document.querySelector('#upload-select-image').setAttribute('action', 'https://js.dump.academy/kekstagram');
       document.querySelector('.upload-form-description').setAttribute('maxlength', '140');
 
       window.initializeScale(scale, popup, apllyScale);
@@ -164,8 +184,7 @@
 
       window.initializeSlider(slider, apllySlider);
 
-
-      uploadSubmit.addEventListener('click', checkForm);
+      uploadForm.addEventListener('submit', onSubmitForm);
     }
   };
 })();
