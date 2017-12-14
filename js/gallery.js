@@ -4,6 +4,8 @@
 
   window.gallery = {
     renderPictures: function (data) {
+      pictureContainer.innerHTML = '';
+
       var fragment = document.createDocumentFragment();
       data.forEach(function (item, i) {
         fragment.appendChild(window.picture.createPicture(item, i));
