@@ -25,7 +25,7 @@
       }
       return randomArr;
     },
-    clickHandler: function () {
+    onClick: function () {
       var args = Array.from(arguments);
       var callback = args[0];
 
@@ -34,7 +34,7 @@
         callback.apply(null, args);
       };
     },
-    keyDownHendler: function () {
+    onKeyDown: function () {
       var args = Array.from(arguments);
       var callback = args.splice(0, 1)[0];
       var keyCode = args.splice(0, 1)[0];

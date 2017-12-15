@@ -6,31 +6,41 @@
   var popupComments = popup.querySelector('.comments-count');
   var popupClose = popup.querySelector('.gallery-overlay-close');
 
+
+  function closePopup(evt) {
+    if (evt.target.closest('.gallery-overlay-close') || event.keyCode === window.utils.ESC_KEYCODE) {
+      if (!popup.classList.contains('hidden')) {
+        popup.classList.add('hidden');
+
+        document.removeEventListener('keydown', window.utils.onKeyDown(closePopup, window.utils.ESC_KEYCODE));
+        popup.removeEventListener('keydown', window.utils.onKeyDown(closePopup, window.utils.ENTER_KEYCODE));
+        popup.removeEventListener('click', window.utils.onClick(closePopup));
+      }
+    }
+  }
+
+  function render(pic) {
+    popupImg.src = pic.url;
+    popupLikes.textContent = pic.likes;
+    popupComments.textContent = pic.comments.length;
+
+    popup.classList.remove('hidden');
+    if (!popupClose.getAttribute('tabindex')) {
+      popupClose.setAttribute('tabindex', 0);
+    }
+
+    document.addEventListener('keydown', window.utils.onKeyDown(closePopup, window.utils.ESC_KEYCODE));
+    popup.addEventListener('keydown', window.utils.onKeyDown(closePopup, window.utils.ENTER_KEYCODE));
+    popup.addEventListener('click', window.utils.onClick(closePopup));
+  }
+
   window.preview = {
-    popup: popup,
-    openPopup: function (evt, data) {
+    open: function (evt, data) {
       evt.preventDefault();
       var target = evt.target.closest('.picture');
       if (target) {
         var index = parseInt(target.dataset.key, 10);
-        window.preview.renderPopup(data[index]);
-      }
-    },
-    closePopup: function (evt) {
-      if (evt.target.closest('.gallery-overlay-close') || event.keyCode === window.utils.ESC_KEYCODE) {
-        if (!popup.classList.contains('hidden')) {
-          popup.classList.add('hidden');
-        }
-      }
-    },
-    renderPopup: function (pic) {
-      popupImg.src = pic.url;
-      popupLikes.textContent = pic.likes;
-      popupComments.textContent = pic.comments.length;
-
-      window.preview.popup.classList.remove('hidden');
-      if (!popupClose.getAttribute('tabindex')) {
-        popupClose.setAttribute('tabindex', 0);
+        render(data[index]);
       }
     }
   };

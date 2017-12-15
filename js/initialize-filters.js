@@ -2,10 +2,10 @@
 (function () {
   window.initializeFilters = function (radioContainer, callBack) {
     function onClickFilter(evt) {
-      var elt = evt.target.closest('input[type="radio"]');
+      var elem = evt.target.closest('input[type="radio"]');
       var filter = '';
-      if (elt) {
-        filter = elt.id;
+      if (elem) {
+        filter = elem.id;
         if (typeof callBack === 'function') {
           callBack(filter);
         }

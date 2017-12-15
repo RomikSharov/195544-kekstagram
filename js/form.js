@@ -24,6 +24,8 @@
     step: 25
   };
 
+  var commentLength = 140;
+
   var sliderForm = uploadPopup.querySelector('.upload-effect-level');
   var slider = sliderForm.querySelector('.upload-effect-level-pin');
   var bar = sliderForm.querySelector('.upload-effect-level-val');
@@ -84,9 +86,10 @@
     popup.effect = 100;
   }
 
-  function openUploadFile(evt) {
+  function onChange(evt) {
     evt.preventDefault();
     uploadPopup.classList.remove('hidden');
+
     renderPopup();
   }
 
@@ -169,22 +172,19 @@
     }
   }
 
-  window.form = {
-    registerEventHandlers: function () {
-      uploadFile.addEventListener('change', openUploadFile);
-      uploadPopup.addEventListener('click', closeUploadFile);
-      document.addEventListener('keydown', window.utils.keyDownHendler(closeUploadFile, window.utils.ESC_KEYCODE));
-      document.addEventListener('keydown', window.utils.keyDownHendler(closeUploadFile, window.utils.ENTER_KEYCODE));
+  window.data.load();
+  window.initializeScale(scale, popup, apllyScale);
+  window.initializeFilters(radioContainer, apllyFilter);
+  window.initializeSlider(slider, apllySlider);
+  window.sort.initilize();
 
-      document.querySelector('.upload-form-description').setAttribute('maxlength', '140');
+  uploadFile.addEventListener('change', onChange);
+  uploadPopup.addEventListener('click', window.utils.onClick(closeUploadFile));
+  document.addEventListener('keydown', window.utils.onKeyDown(closeUploadFile, window.utils.ESC_KEYCODE));
+  document.addEventListener('keydown', window.utils.onKeyDown(closeUploadFile, window.utils.ENTER_KEYCODE));
 
-      window.initializeScale(scale, popup, apllyScale);
+  document.querySelector('.upload-form-description').setAttribute('maxlength', commentLength);
 
-      window.initializeFilters(radioContainer, apllyFilter);
+  uploadForm.addEventListener('submit', onSubmitForm);
 
-      window.initializeSlider(slider, apllySlider);
-
-      uploadForm.addEventListener('submit', onSubmitForm);
-    }
-  };
 })();

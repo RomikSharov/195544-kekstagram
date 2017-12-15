@@ -3,7 +3,7 @@
   var pictureTemplate = document.querySelector('#picture-template');
 
   window.picture = {
-    createPicture: function (data, i) {
+    create: function (data, i) {
       var template = pictureTemplate.content.cloneNode(true);
       template.querySelector('.picture').dataset.key = i;
       template.querySelector('img').src = data.url;

@@ -1,22 +1,19 @@
 'use strict';
 (function () {
-  var photoData = [];
+  var photosData = [];
 
-  function onLoad(photosData) {
-    photoData = photosData;
-    window.gallery.renderPictures(photosData);
-    window.gallery.registerEventHandlers(photosData);
-
-    window.sort.initilize();
+  function onLoad(data) {
+    photosData = data;
+    window.gallery.render(data);
   }
 
   window.data = {
 
-    getPhotos: function () {
+    load: function () {
       window.backend.load(onLoad, window.utils.onError);
     },
-    getPhotoData: function () {
-      return photoData;
+    get: function () {
+      return photosData;
     },
   };
 })();

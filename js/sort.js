@@ -9,11 +9,11 @@
   var photoData = [];
 
   function showPhotos() {
-    window.gallery.renderPictures(photoData);
+    window.gallery.render(photoData);
   }
 
   function onClickFilterPopular() {
-    photoData = window.data.getPhotoData().slice();
+    photoData = window.data.get().slice();
     photoData.sort(function (first, second) {
       return second.likes - first.likes;
     });
@@ -21,7 +21,7 @@
   }
 
   function onClickFilterDiscussed() {
-    photoData = window.data.getPhotoData().slice();
+    photoData = window.data.get().slice();
     photoData.sort(function (first, second) {
       return second.comments.length - first.comments.length;
     });
@@ -29,12 +29,12 @@
   }
 
   function onClickFilterRecommend() {
-    photoData = window.data.getPhotoData().slice();
+    photoData = window.data.get().slice();
     window.debounce(showPhotos);
   }
 
   function onClickFilterRandom() {
-    photoData = window.data.getPhotoData().slice();
+    photoData = window.data.get().slice();
     photoData = window.utils.getRandomArr(photoData, 25);
     photoData = photoData.filter(function (item, pos) {
       return photoData.indexOf(item) === pos;
