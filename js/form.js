@@ -13,10 +13,15 @@
 
   var hashtagsElem = uploadPopup.querySelector('.upload-form-hashtags');
 
+  var popupDefaultParameters = {
+    scale: 100,
+    filter: 'effect-none',
+    effect: 100
+  };
   var popup = {
-    'scale': 100,
-    'filter': 'effect-none',
-    'effect': 100
+    scale: popupDefaultParameters.scale,
+    filter: popupDefaultParameters.filter,
+    effect: popupDefaultParameters.effect
   };
   var scale = {
     min: 25,
@@ -57,9 +62,9 @@
     bar.style.width = popup.effect + '%';
     sliderUploadValue.setAttribute('value', Math.round(popup.effect));
 
-    imagePreview.classList.value = 'effect-image-preview ' + popup.filter;
+    imagePreview.classList.add(popup.filter);
 
-    if (popup.filter === 'effect-none') {
+    if (popup.filter === popupDefaultParameters.filter) {
       sliderForm.classList.add('hidden');
     } else {
       sliderForm.classList.remove('hidden');
@@ -74,10 +79,10 @@
 
   function resetDefault() {
     hashtagsElem.style.borderColor = window.utils.BLACK;
-    imagePreview.classList.value = 'effect-image-preview';
-    popup.scale = 100;
-    popup.filter = 'effect-none';
-    popup.effect = 100;
+    imagePreview.classList.remove(popup.filter);
+    popup.scale = popupDefaultParameters.scale;
+    popup.filter = popupDefaultParameters.filter;
+    popup.effect = popupDefaultParameters.effect;
   }
 
   function onChange(evt) {
@@ -97,9 +102,14 @@
   }
 
   function apllyFilter(actualFilter) {
-    popup.filter = actualFilter.substring('upload-'.length);
-    popup.effect = 100;
-    renderPopup();
+    var oldFilter = popup.filter;
+    var newFilter = actualFilter.substring('upload-'.length);
+    if (oldFilter !== newFilter) {
+      imagePreview.classList.remove(oldFilter);
+      popup.filter = newFilter;
+      popup.effect = 100;
+      renderPopup();
+    }
   }
   function apllyScale(actualScale) {
     popup.scale = actualScale;
@@ -149,6 +159,15 @@
     return false;
   }
 
+  function onFocusHashtags() {
+    hashtagsElem.style.borderColor = window.utils.BLACK;
+    window.utils.removeErrorMessage();
+  }
+  function onBlurHashtags() {
+    hashtagsElem.removeEventListener('focus', onFocusHashtags);
+    hashtagsElem.removeEventListener('blur', onBlurHashtags);
+  }
+
   function onSubmitForm(evt) {
     evt.preventDefault();
 
@@ -161,6 +180,8 @@
     if (checkHashtags()) {
       hashtagsElem.style.borderColor = window.utils.RED;
       evt.preventDefault();
+      hashtagsElem.addEventListener('focus', onFocusHashtags);
+      hashtagsElem.addEventListener('blur', onBlurHashtags);
     } else {
       window.backend.save(new FormData(uploadForm), onLoad, window.utils.onError);
     }
@@ -176,10 +197,6 @@
   uploadPopup.addEventListener('click', window.utils.onClick(closeUploadFile));
   document.addEventListener('keydown', window.utils.onKeyDown(closeUploadFile, window.utils.ESC_KEYCODE));
   document.addEventListener('keydown', window.utils.onKeyDown(closeUploadFile, window.utils.ENTER_KEYCODE));
-
-  hashtagsElem.addEventListener('change', function () {
-    hashtagsElem.style.borderColor = window.utils.BLACK;
-  });
 
   document.querySelector('.upload-form-description').setAttribute('maxlength', commentLength);
 
