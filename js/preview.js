@@ -8,7 +8,7 @@
 
 
   function closePopup(evt) {
-    if (evt.target.closest('.gallery-overlay-close') || event.keyCode === window.utils.ESC_KEYCODE) {
+    if (evt.target.closest('.gallery-overlay-close') || evt.keyCode === window.utils.ESC_KEYCODE) {
       if (!popup.classList.contains('hidden')) {
         popup.classList.add('hidden');
 

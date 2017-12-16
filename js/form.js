@@ -26,6 +26,19 @@
 
   var commentLength = 140;
 
+  var hashtagParameters = {
+    quantity: 5,
+    length: 20
+  };
+
+  var filterNameToFilterValue = {
+    'effect-chrome': {type: 'grayscale(', multiplier: 0.01, end: ')'},
+    'effect-sepia': {type: 'sepia(', multiplier: 0.01, end: ')'},
+    'effect-marvin': {type: 'invert(', multiplier: 1, end: '%)'},
+    'effect-phobos': {type: 'blur(', multiplier: 0.05, end: 'px'},
+    'effect-heat': {type: 'brightness(', multiplier: 0.03, end: ')'}
+  };
+
   var sliderForm = uploadPopup.querySelector('.upload-effect-level');
   var slider = sliderForm.querySelector('.upload-effect-level-pin');
   var bar = sliderForm.querySelector('.upload-effect-level-val');
@@ -44,10 +57,7 @@
     bar.style.width = popup.effect + '%';
     sliderUploadValue.setAttribute('value', Math.round(popup.effect));
 
-    if (imagePreview.classList.length === 2) {
-      imagePreview.classList.remove(imagePreview.classList[1]);
-    }
-    imagePreview.classList.add(popup.filter);
+    imagePreview.classList.value = 'effect-image-preview ' + popup.filter;
 
     if (popup.filter === 'effect-none') {
       sliderForm.classList.add('hidden');
@@ -55,32 +65,16 @@
       sliderForm.classList.remove('hidden');
     }
 
-    switch (popup.filter) {
-      case 'effect-chrome':
-        imagePreview.style.filter = 'grayscale(' + 0.01 * popup.effect + ')';
-        break;
-      case 'effect-sepia':
-        imagePreview.style.filter = 'sepia(' + 0.01 * popup.effect + ')';
-        break;
-      case 'effect-marvin':
-        imagePreview.style.filter = 'invert(' + popup.effect + '%)';
-        break;
-      case 'effect-phobos':
-        imagePreview.style.filter = 'blur(' + 0.05 * popup.effect + 'px)';
-        break;
-      case 'effect-heat':
-        imagePreview.style.filter = 'brightness(' + 0.03 * popup.effect + ')';
-        break;
-      default:
-        imagePreview.style.filter = '';
+    if (filterNameToFilterValue[popup.filter]) {
+      imagePreview.style.filter = filterNameToFilterValue[popup.filter].type + filterNameToFilterValue[popup.filter].multiplier * popup.effect + filterNameToFilterValue[popup.filter].end;
+    } else {
+      imagePreview.style.filter = '';
     }
   }
 
   function resetDefault() {
     hashtagsElem.style.borderColor = window.utils.BLACK;
-    if (imagePreview.classList.length === 2) {
-      imagePreview.classList.remove(imagePreview.classList[1]);
-    }
+    imagePreview.classList.value = 'effect-image-preview';
     popup.scale = 100;
     popup.filter = 'effect-none';
     popup.effect = 100;
@@ -122,14 +116,14 @@
       return false;
     }
     var hashtags = hashtagsElem.value.split(' ');
-    var length = hashtags.length;
+    var quantity = hashtags.length;
     //  проверяю количество хэш-тегов
-    if (length > 5) {
-      window.utils.onError('Хеш-тёгов должно быть не больше 5');
+    if (quantity > hashtagParameters.quantity) {
+      window.utils.onError('Хеш-тёгов должно быть не больше ' + hashtagParameters.quantity);
       return true;
     }
 
-    for (var i = 0; i < length; i++) {
+    for (var i = 0; i < quantity; i++) {
       //  проверяю первый символ хэш-тега
       if (hashtags[i][0] !== '#') {
         window.utils.onError('Хеш-тёги должны начинатся с #');
@@ -140,12 +134,12 @@
         return true;
       }
       //  проверяю длину хэш-тега
-      if (hashtags[0].length > 21) {
-        window.utils.onError('Хеш-тёги должны быть короче 20 символов');
+      if (hashtags[0].length > hashtagParameters.length) {
+        window.utils.onError('Хеш-тёги должны быть короче ' + hashtagParameters.length + 'символов');
         return true;
       }
       //  проверяю совпадение хэш-тегов
-      for (var j = i; j < length; j++) {
+      for (var j = i; j < quantity; j++) {
         if (hashtags[i].toLowerCase() === hashtags[j].toLowerCase() && i !== j) {
           window.utils.onError('Хеш-тёги не должны повторяться');
           return true;
@@ -182,6 +176,10 @@
   uploadPopup.addEventListener('click', window.utils.onClick(closeUploadFile));
   document.addEventListener('keydown', window.utils.onKeyDown(closeUploadFile, window.utils.ESC_KEYCODE));
   document.addEventListener('keydown', window.utils.onKeyDown(closeUploadFile, window.utils.ENTER_KEYCODE));
+
+  hashtagsElem.addEventListener('change', function () {
+    hashtagsElem.style.borderColor = window.utils.BLACK;
+  });
 
   document.querySelector('.upload-form-description').setAttribute('maxlength', commentLength);
 
